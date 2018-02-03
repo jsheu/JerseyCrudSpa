@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title>Sports Jersey CRUD SPA Project (on the MEAN Stack platform)</title>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-smart-table/2.1.11/smart-table.min.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.js"></script>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<style type="text/css">
+		body {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<h1>Sports Jersey CRUD SPA</h1>
+	
+	<div ng-app="jerseyApp" ng-controller="JerseyController">
+
+		<div ng-show="loading"><h3>Loading...</h3></div>
+
+		<div class="row well">
+			<button type="button" class="btn btn-info" ng-click="showModalAddJersey()">
+				<i class="glyphicon glyphicon-plus">
+				</i> Add New Jersey
+			</button>
+		</div>
+
+		<table st-table="displayedJerseys" st-safe-src="jerseys" class="table table-striped">
+			<thead>
+				<tr>
+					<th st-sort="league">League</th>
+					<th st-sort="team">Team</th>
+					<th st-sort="era">Era</th>
+					<th st-sort="uniform">Uniform</th>
+					<th st-sort="color">Color</th>
+					<th st-sort="player">Player</th>
+					<th st-sort="number">Number</th>
+					<th st-sort="action">Action</th>
+				</tr>
+				<tr>
+					<th colspan="8">
+						<input st-search placeholder="Global Search" class="input-sm form-control" type="search" />
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="jersey in displayedJerseys">
+					<td class="box league">{{jersey.league}}</td>
+					<td class="box team">{{jersey.team}}</td>
+					<td class="box era">{{jersey.era}}</td>
+					<td class="box uniform">{{jersey.uniform}}</td>
+					<td class="box color">{{jersey.color}}</td>
+					<td class="box player">{{jersey.player}}</td>
+					<td class="box number">{{jersey.number}}</td>
+					<td>
+						<div class="btn-group" role="group" aria-label="...">
+							<button type="button" class="btn btn-info" ng-click="showModalJerseyView(jersey._id)">
+								<i class="glyphicon glyphicon-search">
+								</i>
+							</button>
+							<button type="button" class="btn btn-default" ng-click="showModalJerseyEdit(jersey._id)">
+								<i class="glyphicon glyphicon-pencil">
+								</i>
+							</button>
+							<button type="button" class="btn btn-danger" ng-click="showModalJerseyDelete(jersey._id)">
+								<i class="glyphicon glyphicon-trash">
+								</i>
+							</button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<div>
+		<h3>Technologies involved in this project:</h3>
+		<ul>
+			<li>Platform: 
+				<a href="http://mean.io/" target="_blank">MEAN Stack</a>
+				(<a href="https://www.mongodb.com/" target="_blank">MongoDB</a>,
+				<a href="https://expressjs.com/" target="_blank">Express.js</a>,
+				<a href="https://angularjs.org/" target="_blank">AngularJS</a>,
+				<a href="https://nodejs.org/" target="_blank">Node.js</a>)
+			</li>
+			<li>CSS Framework: <a href="https://angular-ui.github.io/bootstrap/" target="_blank">UI Bootstrap</a></li>
+			<li>AngularJS Module: <a href="http://lorenzofox3.github.io/smart-table-website/" target="_blank">Smart-Table</a></li>
+			<li>IDE: <a href="https://www.visualstudio.com/vs/community/" target="_blank">Visual Studio 2017 Community</a></li>
+			<li>Hosting: <a href="https://www.gearhost.com/" target="_blank">GearHost</a></li>
+		</ul>
+		<p>This project is available on <a href="https://github.com/jsheu/JerseyCrudSpa" target="_blank">GitHub</a>.</p>
+
+		<hr />
+		<p>
+			Produced by <a href="http://www.jamessheu.com/" target="_blank">James Sheu</a>: 
+			<a href="https://www.linkedin.com/in/jamessheu/" target="_blank">Web Developer</a> and 
+			<a href="http://www.jamessheu.com/jerseys" target="_blank">Jersey Collector</a>.
+		</p>
+	</div>
+
+		<script type="text/javascript">
+
+			var jerseyApp = angular.module('jerseyApp', ['smart-table', 'ui.bootstrap']);
+
+			jerseyApp.controller('JerseyController', ['$scope', '$http', '$uibModal',
+				function ($scope, $http, $modal) {
+					$scope.loading = false;
+					var modalInstance = null;
+
+					//return list of all jerseys
+					$scope.getJerseyListData = function () {
+						$scope.loading = true;
+						$http.get("/api/jerseys")
+							.then(function (response) {
+								$scope.jerseys = response.data;
+								$scope.loading = false;
+							});
+					}
+
+					$scope.showModalJerseyView = function (id) {
+						if (id != "") {
+							$http.get("/api/jerseys/" + id)
+								.then(function (response) {
+									modalInstance = $modal.open({
+										animation: true,
+										templateUrl: 'modals/jerseyView.html',
+										controller: 'jerseyViewCtrl',
+										scope: $scope,
+										size: '',
+										resolve: {
+											record: function () {
+												return response.data;
+											}
+										}
+									});
+								});
+						}
+					}
+
+					$scope.showModalAddJersey = function () {
+						modalInstance = $modal.open({
+							animation: true,
+							templateUrl: 'modals/jerseyAdd.html',
+							controller: 'jerseyAddCtrl',
+							scope: $scope,
+							size: '',
+							resolve: {
+							}
+						});
+					}
+
+					$scope.showModalJerseyEdit = function (id) {
+						if (id != "") {
+							$http.get("/api/jerseys/" + id)
+								.then(function (response) {
+									modalInstance = $modal.open({
+										animation: false,
+										templateUrl: 'modals/jerseyEdit.html',
+										controller: 'jerseyEditCtrl',
+										scope: $scope,
+										size: '',
+										resolve: {
+											record: function () {
+												return response.data;
+											}
+										}
+									});
+								});
+						}
+					}
+
+					$scope.showModalJerseyDelete = function (id) {
+						if (id != "") {
+							$http.get("/api/jerseys/" + id)
+								.then(function (response) {
+									modalInstance = $modal.open({
+										animation: false,
+										templateUrl: 'modals/jerseyDelete.html',
+										controller: 'jerseyDeleteCtrl',
+										scope: $scope,
+										size: '',
+										resolve: {
+											record: function () {
+												return response.data;
+											}
+										}
+									});
+								});
+						}
+					}
+
+					$scope.cancelModal = function () {
+						modalInstance.dismiss('cancel');
+					}
+
+					$scope.createJerseyInDatabase = function (params) {
+						console.log(params);
+						$http.post("/api/jerseys", params)
+							.then(function (response) {
+								console.log(response);
+								$scope.getJerseyListData();
+							});
+					}
+
+					$scope.updateJerseyInDatabase = function (params) {
+						$http.put("/api/jerseys/" + params._id, params)
+							.then(function (response) {
+								console.log(response);
+								$scope.getJerseyListData();
+							});
+					}
+
+					$scope.deleteJerseyFromDatabase = function (id) {
+						$http.delete("/api/jerseys/" + id)
+							.then(function (response) {
+								console.log(response);
+								$scope.getJerseyListData();
+							});
+					}
+
+					$scope.getJerseyListData();
+				}
+			]);
+
+			jerseyApp.controller('jerseyViewCtrl', ['$scope', '$http', 'record', function ($scope, $http, record) {
+				function init() {
+					$scope.jersey = record[0];
+				}
+				init();
+			}]);
+
+			jerseyApp.controller('jerseyAddCtrl', ['$scope', '$http', function ($scope, $http) {
+				$scope.createJerseyFromCtrl = function () {
+					$scope.jersey = {};
+
+					if (!angular.isDefined($scope.league) || $scope.league === '') {
+						alert('League is required.');
+						return;
+					}
+					else if (!angular.isDefined($scope.team) || $scope.team === '') {
+						alert('Team name is required.');
+						return;
+					} else if (!angular.isDefined($scope.era) || $scope.era === '') {
+						alert('Era is required.');
+						return;
+					} else if (!angular.isDefined($scope.uniform) || $scope.uniform === '') {
+						alert('Uniform is required.');
+						return;
+					} else if (!angular.isDefined($scope.color) || $scope.color === '') {
+						alert('Color is required.');
+						return;
+					} else {
+						$scope.jersey._id = $scope._id;
+						$scope.jersey.league = $scope.league;
+						$scope.jersey.team = $scope.team;
+						$scope.jersey.era = $scope.era;
+						$scope.jersey.uniform = $scope.uniform;
+						$scope.jersey.color = $scope.color;
+						$scope.jersey.player = $scope.player;
+						$scope.jersey.number = $scope.number;
+						console.log($scope.jersey);
+					}
+					$scope.cancelModal();
+					$scope.createJerseyInDatabase($scope.jersey);
+				};
+			}]);
+
+			jerseyApp.controller('jerseyEditCtrl', ['$scope', '$http', 'record', function ($scope, $http, record) {
+				$scope.jersey = {};
+				function init() {
+					$scope.jersey._id = record[0]._id;
+					$scope.jersey.league = record[0].league;
+					$scope.jersey.team = record[0].team;
+					$scope.jersey.era = record[0].era;
+					$scope.jersey.uniform = record[0].uniform;
+					$scope.jersey.color = record[0].color;
+					$scope.jersey.player = record[0].player;
+					$scope.jersey.number = record[0].number;
+				}
+				$scope.updateJerseyFromCtrl = function () {
+					$scope.cancelModal();
+					if (!angular.isDefined($scope.jersey.league) || $scope.jersey.league === '') {
+						alert('League is required.');
+						return;
+					} else if (!angular.isDefined($scope.jersey.team) || $scope.jersey.team === '') {
+						alert('Team name is required.');
+						return;
+					} else if (!angular.isDefined($scope.jersey.era) || $scope.jersey.era === '') {
+						alert('Era is requiired.');
+						return;
+					} else if (!angular.isDefined($scope.jersey.uniform) || $scope.jersey.uniform === '') {
+						alert('Uniform is required.');
+						return;
+					} else if (!angular.isDefined($scope.jersey.color) || $scope.jersey.color === '') {
+						alert('Color is required.');
+						return;
+					}
+					$scope.updateJerseyInDatabase($scope.jersey);
+				}
+				init();
+			}]);
+
+			jerseyApp.controller('jerseyDeleteCtrl', ['$scope', '$http', 'record', function ($scope, $http, record) {
+				function init() {
+					$scope.jersey = record[0];
+				}
+				$scope.deleteJerseyFromCtrl = function () {
+					$scope.cancelModal();
+					$scope.deleteJerseyFromDatabase($scope.jersey._id);
+				}
+				init();
+			}]);
+
+		</script>
+
+</body>
+</html>

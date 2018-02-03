@@ -1,0 +1,17 @@
+{
+  "name": "jersey-crud-spa",
+  "version": "0.0.0",
+  "description": "Jersey CRUD SPA build with the MEAN stack.",
+  "main": "app.js",
+  "author": {
+    "name": "jsheu"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.87"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongoose": "^5.0.1"
+  }
+}
